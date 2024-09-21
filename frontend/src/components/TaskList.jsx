@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { updateTask, deleteTask } from '../store/tasksSlice';
 import { Pencil, Trash2, Check } from 'lucide-react';
-import { toast } from 'react-hot-toast';
 
 const TaskList = () => {
   const tasks = useSelector((state) => state.tasks.items);
@@ -15,30 +14,19 @@ const TaskList = () => {
     setEditingId(task.id);
     setEditTitle(task.title);
     setEditDescription(task.description);
-
   };
 
   const handleUpdateTask = () => {
-    dispatch(updateTask({ id: editingId, title: editTitle, description: editDescription }))
-    .unwrap()
-  .then(() => {
+    dispatch(updateTask({ id: editingId, title: editTitle, description: editDescription }));
     setEditingId(null);
-    toast.success('Task updated successfully');
-  })
-  .catch((error) => {
-    toast.error('Failed to update task');
-  });
   };
 
   const handleDeleteClick = (taskId) => {
-    dispatch(deleteTask(taskId))
-    .unwrap()
-  .then(() => {
-    toast.success('Task deleted successfully');
-  })
-  .catch((error) => {
-    toast.error('Failed to delete task');
-  });
+    dispatch(deleteTask(taskId));
+  };
+
+  const handleCompletedChange = (task) => {
+    dispatch(updateTask({ ...task, completed: !task.completed }));
   };
 
   return (
@@ -69,8 +57,16 @@ const TaskList = () => {
               </div>
             ) : (
               <>
-                <h3 className="font-medium">{task.title}</h3>
-                <p className="text-gray-600">{task.description}</p>
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={task.completed}
+                    onChange={() => handleCompletedChange(task)}
+                    className="mr-2"
+                  />
+                  <h3 className={`font-medium ${task.completed ? 'line-through text-gray-500' : ''}`}>{task.title}</h3>
+                </div>
+                <p className={`text-gray-600 ${task.completed ? 'line-through' : ''}`}>{task.description}</p>
                 <span className={`inline-block px-2 py-1 rounded-full text-sm ${task.completed ? 'bg-green-200 text-green-800' : 'bg-yellow-200 text-yellow-800'}`}>
                   {task.completed ? 'Completed' : 'Pending'}
                 </span>
