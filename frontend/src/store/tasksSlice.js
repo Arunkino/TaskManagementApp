@@ -1,25 +1,27 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../utils/axiosConfig';
 
-const TASKS_URL = 'tasks/';
-
 export const fetchTasks = createAsyncThunk('tasks/fetchTasks', async () => {
-  const response = await axiosInstance.get(TASKS_URL);
+  const response = await axiosInstance.get('tasks/');
+  console.log('Fetched tasks:', response.data);
   return response.data;
 });
 
 export const addTask = createAsyncThunk('tasks/addTask', async (task) => {
-  const response = await axiosInstance.post(TASKS_URL, task);
+  const response = await axiosInstance.post('tasks/', task);
+  console.log('Added task:', response.data);
   return response.data;
 });
 
 export const updateTask = createAsyncThunk('tasks/updateTask', async (task) => {
-  const response = await axiosInstance.put(`${TASKS_URL}${task.id}/`, task);
+  const response = await axiosInstance.put(`tasks/${task.id}/`, task);
+  console.log('Updated task:', response.data);
   return response.data;
 });
 
 export const deleteTask = createAsyncThunk('tasks/deleteTask', async (taskId) => {
-  await axiosInstance.delete(`${TASKS_URL}${taskId}/`);
+  await axiosInstance.delete(`tasks/${taskId}/`);
+  console.log('Deleted task:', taskId);
   return taskId;
 });
 
@@ -30,7 +32,31 @@ const tasksSlice = createSlice({
     status: 'idle',
     error: null,
   },
-  reducers: {},
+  reducers: {
+    taskUpdated(state, action) {
+      console.log('taskUpdated reducer called with:', action.payload);
+      const { action: wsAction, task } = action.payload;
+      switch (wsAction) {
+        case 'create':
+          console.log('Creating new task:', task);
+          state.items.push(task);
+          break;
+        case 'update':
+          console.log('Updating task:', task);
+          const index = state.items.findIndex(t => t.id === task.id);
+          if (index !== -1) {
+            state.items[index] = task;
+          }
+          break;
+        case 'delete':
+          console.log('Deleting task:', task.id);
+          state.items = state.items.filter(t => t.id !== task.id);
+          break;
+        default:
+          console.log('Unknown WebSocket action:', wsAction);
+      }
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchTasks.pending, (state) => {
@@ -43,20 +69,9 @@ const tasksSlice = createSlice({
       .addCase(fetchTasks.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message;
-      })
-      .addCase(addTask.fulfilled, (state, action) => {
-        state.items.push(action.payload);
-      })
-      .addCase(updateTask.fulfilled, (state, action) => {
-        const index = state.items.findIndex(task => task.id === action.payload.id);
-        if (index !== -1) {
-          state.items[index] = action.payload;
-        }
-      })
-      .addCase(deleteTask.fulfilled, (state, action) => {
-        state.items = state.items.filter(task => task.id !== action.payload);
       });
   },
 });
 
+export const { taskUpdated } = tasksSlice.actions;
 export default tasksSlice.reducer;
