@@ -17,4 +17,4 @@ class TaskViewSet(viewsets.ModelViewSet):
             serializer.save(user=default_user)
 
     def get_queryset(self):
-        return self.queryset
+        return self.queryset.all()

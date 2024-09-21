@@ -1,16 +1,26 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import axiosInstance from '../utils/axiosConfig';
 
-const API_URL = 'http://localhost:8000/api/tasks/';
+const TASKS_URL = 'tasks/';
 
 export const fetchTasks = createAsyncThunk('tasks/fetchTasks', async () => {
-  const response = await axios.get(API_URL);
+  const response = await axiosInstance.get(TASKS_URL);
   return response.data;
 });
 
 export const addTask = createAsyncThunk('tasks/addTask', async (task) => {
-  const response = await axios.post(API_URL, task);
+  const response = await axiosInstance.post(TASKS_URL, task);
   return response.data;
+});
+
+export const updateTask = createAsyncThunk('tasks/updateTask', async (task) => {
+  const response = await axiosInstance.put(`${TASKS_URL}${task.id}/`, task);
+  return response.data;
+});
+
+export const deleteTask = createAsyncThunk('tasks/deleteTask', async (taskId) => {
+  await axiosInstance.delete(`${TASKS_URL}${taskId}/`);
+  return taskId;
 });
 
 const tasksSlice = createSlice({
@@ -36,6 +46,15 @@ const tasksSlice = createSlice({
       })
       .addCase(addTask.fulfilled, (state, action) => {
         state.items.push(action.payload);
+      })
+      .addCase(updateTask.fulfilled, (state, action) => {
+        const index = state.items.findIndex(task => task.id === action.payload.id);
+        if (index !== -1) {
+          state.items[index] = action.payload;
+        }
+      })
+      .addCase(deleteTask.fulfilled, (state, action) => {
+        state.items = state.items.filter(task => task.id !== action.payload);
       });
   },
 });

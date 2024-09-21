@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { addTask } from '../store/tasksSlice';
+import toast from 'react-hot-toast';
 
 const AddTask = () => {
   const [title, setTitle] = useState('');
@@ -10,9 +11,17 @@ const AddTask = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (title.trim()) {
-      dispatch(addTask({ title, description }));
-      setTitle('');
-      setDescription('');
+      dispatch(addTask({ title, description }))
+      .unwrap()
+      .then(() => {
+        setTitle('');
+        setDescription('');
+        toast.success('Task added successfully!');
+      })
+      .catch((error) => {
+        toast.error('Failed to add task!');
+      });
+      
     }
   };
 
