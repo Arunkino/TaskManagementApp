@@ -3,11 +3,13 @@ import { useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import axiosInstance from '../utils/axiosConfig';
+import { LoadingSpinner } from './LoadingSpinner';
 
 const Register = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState('');
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -19,13 +21,20 @@ const Register = () => {
       return;
     }
     try {
+      setLoading(true);
       await axiosInstance.post('register/', { username, email, password });
       toast.success('Registration successful! Please login.');
       navigate('/login');
     } catch (error) {
       toast.error('Registration failed: ' + (error.response?.data?.message || error.message));
+    } finally {
+      setLoading(false);
     }
   };
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-screen"><LoadingSpinner/></div>;
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
