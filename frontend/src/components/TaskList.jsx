@@ -34,7 +34,7 @@ const TaskList = () => {
       <h2 className="text-xl font-semibold mb-4">Task List</h2>
       <ul className="space-y-2">
         {tasks.map((task) => (
-          <li key={task.id} className="bg-white shadow rounded-lg p-4">
+          <li key={task.id} className="bg-white shadow rounded-lg p-4 hover:bg-gray-100">
             {editingId === task.id ? (
               <div>
                 <input

@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import viewsets, status
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from .models import Task
@@ -8,6 +8,7 @@ from .serializers import TaskSerializer, UserSerializer
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 import logging
+from django.db.models import Count
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +35,9 @@ class TaskViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return self.queryset.filter(user=self.request.user)
+    
 
+    # Send WebSocket message
     def send_task_update(self, action, task):
         channel_layer = get_channel_layer()
         data = {
@@ -47,6 +50,40 @@ class TaskViewSet(viewsets.ModelViewSet):
             data
         )
         logger.info(f"WebSocket message sent for {action} task: {task.id if isinstance(task, Task) else task}")
+
+    # Statistics view
+    @action(detail=False, methods=['get'])
+    def statistics(self, request):
+        user_tasks = Task.objects.filter(user=request.user)
+        total_tasks = user_tasks.count()
+        completed_tasks = user_tasks.filter(completed=True).count()
+        pending_tasks = total_tasks - completed_tasks
+
+        # Get tasks created in the last 7 days
+        from django.utils import timezone
+        from datetime import timedelta
+        seven_days_ago = timezone.now() - timedelta(days=7)
+        tasks_last_7_days = user_tasks.filter(created_at__gte=seven_days_ago).count()
+
+        # Get tasks by day of week
+        from django.db.models.functions import ExtractWeekDay
+        tasks_by_day = user_tasks.annotate(day=ExtractWeekDay('created_at')) \
+                               .values('day') \
+                               .annotate(count=Count('id')) \
+                               .order_by('day')
+
+        days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+        tasks_by_day_dict = {days[item['day']-1]: item['count'] for item in tasks_by_day}
+
+        data = {
+            'total_tasks': total_tasks,
+            'completed_tasks': completed_tasks,
+            'pending_tasks': pending_tasks,
+            'tasks_last_7_days': tasks_last_7_days,
+            'tasks_by_day': tasks_by_day_dict
+        }
+
+        return Response(data)
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
