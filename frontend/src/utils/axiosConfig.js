@@ -30,9 +30,12 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      localStorage.removeItem('token');
-      window.location.href = '/login';
-    }
+        // Only remove token and redirect for non-login requests
+        if (!error.config.url.includes('token/')) {
+          localStorage.removeItem('token');
+          window.location.href = '/login';
+        }
+      }
     return Promise.reject(error);
   }
 );

@@ -45,20 +45,31 @@ const TaskStatistics = () => {
         <StatCard title="Pending" value={stats.pending_tasks} color="bg-yellow-100 text-yellow-800" icon="⏳" />
         <StatCard title="Last 7 Days" value={stats.tasks_last_7_days} color="bg-purple-100 text-purple-800" icon="📅" />
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-8 gap-8">
-        <div className="bg-gray-50 p-4 rounded-lg lg:col-span-3">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="bg-gray-50 p-4 rounded-lg">
           <h3 className="font-medium mb-4 text-center text-gray-700">Tasks by Day of Week</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#ccc" />
-              <XAxis dataKey="day" stroke="#666" />
-              <YAxis stroke="#666" />
+              <XAxis 
+                dataKey="day" 
+                stroke="#666" 
+                tick={{fill: '#666'}}
+                tickLine={{stroke: '#666'}}
+                axisLine={{stroke: '#666'}}
+              />
+              <YAxis 
+                stroke="#666"
+                tick={{fill: '#666'}}
+                tickLine={{stroke: '#666'}}
+                axisLine={{stroke: '#666'}}
+              />
               <Tooltip contentStyle={{ backgroundColor: 'white', borderRadius: '8px' }} />
               <Bar dataKey="count" fill="#8884d8" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
-        <div className="bg-gray-50 p-4 rounded-lg lg:col-span-5">
+        <div className="bg-gray-50 p-4 rounded-lg">
           <h3 className="font-medium mb-4 text-center text-gray-700">Task Completion Status</h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
@@ -67,7 +78,7 @@ const TaskStatistics = () => {
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                outerRadius={50}
+                outerRadius={80}
                 fill="#8884d8"
                 dataKey="value"
                 label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}

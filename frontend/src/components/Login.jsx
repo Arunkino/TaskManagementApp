@@ -1,27 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { login } from '../store/authSlice';
+import { login, clearUser } from '../store/authSlice';
 import { toast } from 'react-hot-toast';
-import { Link } from 'react-router-dom';
-
-
+import { Link, useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
-  const { status, error } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
+  const { status, error, token } = useSelector((state) => state.auth);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    dispatch(login({ username, password }))
-      .unwrap()
-      .then(() => {
-        toast.success('Logged in successfully');
-      })
-      .catch((error) => {
-        toast.error('Login failed: ' + error);
-      });
+  useEffect(() => {
+    // Clear any existing errors when component mounts
+    dispatch(clearUser());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (token) {
+      navigate('/');
+    }
+  }, [token, navigate]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // Prevent default form submission
+    
+    if (!username || !password) {
+      toast.error('Please enter both username and password');
+      return;
+    }
+
+    try {
+      await dispatch(login({ username, password })).unwrap();
+      toast.success('Logged in successfully');
+      // Navigation to home page will be handled by the useEffect hook
+    } catch (error) {
+      console.error('Login error:', error);
+      toast.error('Login failed: ' + (error.message || 'Unknown error'));
+    }
   };
 
   return (
@@ -33,6 +49,7 @@ const Login = () => {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <input type="hidden" name="remember" value="true" />
           <div className="rounded-md shadow-sm -space-y-px">
+            {error && <div className="text-red-500 text-center p-4">{error}</div>}
             <div>
               <label htmlFor="username" className="sr-only">Username</label>
               <input
