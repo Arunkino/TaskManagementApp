@@ -1,5 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../utils/axiosConfig';
+import toast from 'react-hot-toast';
+
 
 export const fetchTasks = createAsyncThunk('tasks/fetchTasks', async () => {
   const response = await axiosInstance.get('tasks/');
@@ -20,7 +22,7 @@ export const updateTask = createAsyncThunk('tasks/updateTask', async (task) => {
 });
 
 export const deleteTask = createAsyncThunk('tasks/deleteTask', async (taskId) => {
-  await axiosInstance.delete(`tasks/${taskId}/`);
+  await axiosInstance.delete(`tasks/${taskId}/`).then(() => toast.success('Task deleted successfully!')).catch((error) => toast.error('Failed to delete task: ' + error));
   console.log('Deleted task:', taskId);
   return taskId;
 });

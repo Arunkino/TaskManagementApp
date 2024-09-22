@@ -21,18 +21,22 @@ function Home() {
     }
 
     if (status === 'failed') {
-      return <div className="text-red-500 text-center">Error: {error}</div>;
+      return <div className="text-red-500 text-center p-4">Error: {error}</div>;
     }
 
     return (
-      <div className="container mx-auto p-4">
-        <h1 className="text-3xl font-bold mb-8 text-center">Task Management App</h1>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
-            <AddTask />
-            <TaskList />
+      <div className="container mx-auto p-4 max-w-7xl">
+        <h1 className="text-3xl font-bold mb-8 text-center text-gray-800">Task Management Dashboard</h1>
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="lg:col-span-2 space-y-8">
+            <div className="bg-white shadow-lg rounded-lg p-6">
+              <AddTask />
+            </div>
+            <div className="bg-white shadow-lg rounded-lg p-6">
+              <TaskList />
+            </div>
           </div>
-          <div>
+          <div className="lg:col-span-2">
             <TaskStatistics />
           </div>
         </div>
@@ -40,4 +44,4 @@ function Home() {
     );
 }
 
-export default Home
+export default Home;

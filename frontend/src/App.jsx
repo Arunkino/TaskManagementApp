@@ -8,6 +8,7 @@ import Register from './components/Register';
 import Header from './components/Header';
 import { connectWebSocket, disconnectWebSocket } from './websocket';
 import { taskUpdated } from './store/tasksSlice';
+import Footer from './components/Footer';
 
 function App() {
   const { token } = useSelector((state) => state.auth);
@@ -49,6 +50,7 @@ function App() {
         <Route path="/register" element={token ? <Navigate to="/" /> : <Register />} />
         <Route path="/" element={token ? <Home /> : <Navigate to="/login" />} />
       </Routes>
+      <Footer/>
     </Router>
   );
 }
