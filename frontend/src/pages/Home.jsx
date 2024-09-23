@@ -27,8 +27,8 @@ function Home() {
     return (
       <div className="container mx-auto p-4 max-w-7xl">
         <h1 className="text-3xl font-bold mb-8 text-center text-gray-800">Task Management Dashboard</h1>
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          <div className="lg:col-span-2 space-y-8">
+        <div className="grid grid-cols-1 lg:grid-cols-9 gap-8">
+          <div className="lg:col-span-4 space-y-8">
             <div className="bg-white shadow-lg rounded-lg p-6">
               <AddTask />
             </div>
@@ -36,7 +36,7 @@ function Home() {
               <TaskList />
             </div>
           </div>
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-5">
             <TaskStatistics />
           </div>
         </div>

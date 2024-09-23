@@ -45,8 +45,8 @@ const TaskStatistics = () => {
         <StatCard title="Pending" value={stats.pending_tasks} color="bg-yellow-100 text-yellow-800" icon="⏳" />
         <StatCard title="Last 7 Days" value={stats.tasks_last_7_days} color="bg-purple-100 text-purple-800" icon="📅" />
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-gray-50 p-4 rounded-lg">
+      <div className="grid grid-cols-1 lg:grid-cols-8 gap-8">
+        <div className="bg-gray-50 p-4 rounded-lg lg:col-span-3">
           <h3 className="font-medium mb-4 text-center text-gray-700">Tasks by Day of Week</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={chartData}>
@@ -69,7 +69,7 @@ const TaskStatistics = () => {
             </BarChart>
           </ResponsiveContainer>
         </div>
-        <div className="bg-gray-50 p-4 rounded-lg">
+        <div className="bg-gray-50 p-4 rounded-lg lg:col-span-5">
           <h3 className="font-medium mb-4 text-center text-gray-700">Task Completion Status</h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
