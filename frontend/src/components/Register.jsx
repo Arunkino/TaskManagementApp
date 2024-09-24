@@ -11,6 +11,7 @@ const Register = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -24,9 +25,13 @@ const Register = () => {
       setLoading(true);
       await axiosInstance.post('register/', { username, email, password });
       toast.success('Registration successful! Please login.');
+      setError(null);
       navigate('/login');
     } catch (error) {
-      toast.error('Registration failed: ' + (error.response?.data?.message || error.message));
+      console.error('Registration error:', error);
+      toast.error('Registration failed: ' + (error.response?.data?.username || error.message));
+      setError(error.response?.data?.username || error.message)
+      console.log(error.response.data)
     } finally {
       setLoading(false);
     }
@@ -41,8 +46,13 @@ const Register = () => {
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Create your account</h2>
+
         </div>
+        
+        
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          {error && <p className="text-red-500 text-center">{error}</p>}
+
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
               <label htmlFor="username" className="sr-only">Username</label>
