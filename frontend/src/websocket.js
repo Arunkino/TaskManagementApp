@@ -10,7 +10,8 @@ export const connectWebSocket = (token) => {
 //   const wsScheme = window.location.protocol === 'https:' ? 'wss' : 'ws';
 //   const wsUrl = `${wsScheme}://${window.location.host}/ws/tasks/?token=${token}`;
 
-  const wsUrl = `ws://localhost:8000/ws/tasks/?token=${token}`;
+//   const wsUrl = `ws://localhost:8000/ws/tasks/?token=${token}`;
+const wsUrl = `wss://api.taskmanagement.site/ws/tasks/?token=${token}`;
 
 
   console.log('Attempting to connect WebSocket at:', wsUrl);
